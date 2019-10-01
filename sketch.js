@@ -164,7 +164,7 @@ function scene1(){
     strokeWeight(1);
     noFill();
     
-    stroke(143, 143, 143,150);
+    stroke(100, 100, 100,150);
     for (var f=0; f<frequencies.length; f+=1){
         beginShape();
         for (var x=0; x<T*360; x+=1/frequencies[f]){
