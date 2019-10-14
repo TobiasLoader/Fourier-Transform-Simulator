@@ -1,2 +1,2 @@
-# Fourier-Transform-Simulator
-A Fourier Transform visualiser (approximation to real Fourier transforms). Link: https://tobiasloader.github.io/Fourier-Transform-Simulator/
+# Fourier Transform Simulator
+In the autumn term of 2019, study of Euler’s Formula and Roots of Unity broadened my understanding of complex numbers and led me to the story of the Fourier Transform. I found it fascinating how a seemingly chaotic function could be elegantly separated to reveal its constituent frequencies. I built this graphical simulator to help me better understand the transform process.
