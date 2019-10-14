@@ -26,8 +26,8 @@ function setup() {
 
 	frequencies = [2,3,4,7];
 	
-	T = 2;
-	F = 3;
+	T = 5;
+	F = 2;
 	
 	Q = 8; // Low Q -> High Quality
 	
@@ -53,8 +53,6 @@ function setup() {
 	
 	first = true;
 	
-	textFont('Avenir Next',15);
-	
 	cursor(HAND)
 
 	W = window.innerWidth;
@@ -69,13 +67,14 @@ function setup() {
 
 
 function helpInfo(s){
-	var initControls = "Controls:\n\n - RIGHT/LEFT arrow keys: increase/decrease winding frequency\n - UP/DOWN arrow keys: increase/decrease Time Captured (more/less data)\n\nScene Explanation:\n\n"
+	var Controls = "\n\nControls:\n\nRIGHT & LEFT arrow keys: increase/decrease the rotation frequency\n\nUP & DOWN arrow keys: increase/decrease time captured (more data/less data)\n\nCLICK anywhere on the page to advance to the next scene\n\n";
+	var sceneExplanation = "Explanation of Scene "+str(s)+"\n\n"
 	if (s===1){
-		alert(initControls+"The "+str(frequencies.length)+" grey cosine waves of frequencies: "+str(frequencies)+" are added together to form a single blue wave (below). The aim of the fourier transform is to reverse this process, ie: given an initial 'blue' wave, can we find its individual components (in terms of cosine graphs of pure frequencies).");
+		alert(sceneExplanation+""+str(frequencies.length)+" cosine graphs (in grey) of frequencies "+str(frequencies.slice(0,-1))+" & "+str(frequencies.slice(-1))+" are added together to form one single graph (in blue). The aim of the Fourier Transform is to reverse this process, ie: given an initial 'blue' graph, can we find its individual components (in terms of cosine graphs of pure frequencies)?"+Controls);
 	} else if (s===2){
-		alert(initControls+"Fourier's solution to this problem was to wrap the 'blue' wave around a point with a certain 'winding frequency' (green wave). Then if the winding frequency lined up with any of the component frequencies (one of the previous grey waves), then the whole green 'wrapped' graph would line up on one side. If we record the position of the average X-coordinate, we can determine when this takes place – which allows us to determine the frequencies of the previous grey waves");
+		alert(sceneExplanation+"Fourier's solution to this problem was the equivalent of wrapping the 'blue' graph around a point with a certain 'rotation frequency' (green graph). Then, if that specific rotation frequency is equal to any one of the component frequencies (grey graphs from scene 1), then the whole green 'wrapped' graph would line up on one side. If we record the position of the average X-coordinate, we can determine when this takes place – which allows us to determine the frequencies of the grey graphs from scene 1."+Controls);
 	} else if (s===3){
-		alert(initControls+"This final scene plots (average X-coordinate) against (winding frequency). This therefore effectively does the same calulation as in the previous scene to calculate the average point, but this time with a whole range of frequencies, as opposed to the current user determined winding frequency (indicated by the red dot). The spikes on this graph should roughly line up with component frequencies. NB: For a greater Time Captured, the calculation will take longer, however the results should become more accurate – as there is more data to average. ie: The spikes will become more defined.");
+		alert(sceneExplanation+"This final scene plots the average X-coordinate against the rotation frequency. This is the graph of the final Fourier Transform: the original time domain function (blue graph from scene 1) has been mapped onto a frequency domain function (purple graph in scene 3). The calculations for this scene are effectively the same as in scene 2 (computing the average x-coordinate), however this time it is done across a whole range of frequencies, as opposed to only the rotation frequency determined by the user (indicated by the red dot). The spikes on this graph should roughly line up with component frequencies. NB: for a greater Time Captured, the calculation will take longer, however the results should become more accurate – as there is more data to average, ie: the spikes will become more defined."+Controls);
 	}
 }
 
@@ -87,18 +86,20 @@ function draw() {
         case 2: scene2(); break;
         case 3: scene3(); break;
     }
-    
+    textFont('Quicksand');
     fill(31, 31, 31);
     strokeWeight(1);
     stroke(255, 203, 135);
     textAlign(LEFT,CENTER);
-    text('Cosine Frequencies = '+str(frequencies),15,25);
-    text(" ~ PRESS 'H' FOR HELP ~ ",15,height-25);
+    textSize(20);
+    text("Fourier Transform Simulator: scene " + str(scene) + " of 3",15,25);
+    textSize(15);
+    text("PRESS THE 'D' KEY FOR SCENE DESCRIPTIONS & CONTROLS",15,height-25);
+    
     textAlign(RIGHT,CENTER);
-    text('Coil Frequency = '+str(parseFloat(Math.round(F * 100) / 100).toFixed(2)),width-15,25);
-    text('Time Captured = '+str(parseFloat(Math.round(T * 100) / 100).toFixed(2)),width-15,50);
-    text(' ~ USE ARROW KEYS ~ ',width-15,height-50);
-    text(' ~ CLICK TO ADVANCE ~ ',width-15,height-25);
+    text('Cosine frequencies = '+str(frequencies),width-15,height-25);
+    text('Rotation frequency = '+str(parseFloat(Math.round(F * 100) / 100).toFixed(2)),width-15,25);
+    text('Time captured = '+str(parseFloat(Math.round(T * 100) / 100).toFixed(2)),width-15,50);
 	on = true;
 //     }
     first = false;
@@ -144,7 +145,7 @@ function polarGraph(Draw,Qual,frequency){
     if (Draw){
         beginShape();
     }
-    for (var x=0; x<T*360*3; x+=Qual){
+    for (var x=0; x<T*360; x+=Qual){
         var sumCoses = (height/4)/sumCosines(0,frequency) * sumCosines(x,frequency);
         if (Draw){
             vertex(sumCoses * cos(x)+width/2,sumCoses * sin(x) + height/2);
@@ -168,7 +169,7 @@ function scene1(){
     for (var f=0; f<frequencies.length; f+=1){
         beginShape();
         for (var x=0; x<T*360; x+=1/frequencies[f]){
-            vertex(width*x/(360*T),cosine(x*3,frequencies[f],F) + (f+1)*(height-20)/(frequencies.length+3) + 10); 
+            vertex(width*x/(360*T),-cosine(x,frequencies[f],1) + (f+1)*(height-20)/(frequencies.length+3) + 50); 
         }
         endShape();
     }
@@ -177,7 +178,7 @@ function scene1(){
     stroke(71, 158, 204);
     beginShape();
     for (var x=0; x<T*360; x+=2){
-        vertex(width*x/(360*T),sumCosines(x*3,F) + (frequencies.length+1)*(height-20)/(frequencies.length+3) + 10); 
+        vertex(width*x/(360*T),-sumCosines(x,1) + (frequencies.length+1)*(height-20)/(frequencies.length+3) + 70); 
     }
     endShape();
 }
@@ -229,7 +230,7 @@ function scene3(){
     noFill();
     beginShape();
     for (var p=0; p<fourierCurve.length; p+=1){
-        vertex(p*width*(intevals/(upToFreq+2)),-25*fourierCurve[p]+height/2);    
+        vertex(p*width*(intevals/(upToFreq+2)),-75*fourierCurve[p]+height/2+60);    
     }
     endShape();
     
@@ -238,16 +239,16 @@ function scene3(){
     textAlign(CENTER,BOTTOM);
     for (var f=0; f<frequencies.length; f+=1){
         var xCoor = frequencies[f]*width*(1/(upToFreq+2));
-        var yCoor = -25*fourierCurve[round(frequencies[f]/intevals)]+height/2;
+        var yCoor = -75*fourierCurve[round(frequencies[f]/intevals)]+height/2;
         noFill();
-        ellipse(xCoor,yCoor,7,7);
+        ellipse(xCoor,yCoor+60,7,7);
         fill(120, 41, 148);
-        text(str(frequencies[f]),xCoor,yCoor-10);
+        text(str(frequencies[f]),xCoor,yCoor-10+60);
     }
     
     noStroke();
     fill(235, 5, 5);
-    ellipse(F*width*(1/(upToFreq+2)),-25*fourierCurve[round(F/intevals)]+height/2,7,7);
+    ellipse(F*width*(1/(upToFreq+2)),-75*fourierCurve[round(F/intevals)]+height/2+ 60,7,7);
     
 }
 
@@ -289,7 +290,7 @@ function keyPressed(){
     if (keyCode===40 && T > 0.0){
 	    Tchange = -1;
     }
-    if (keyCode===72){
+    if (keyCode===68){
         helpInfo(scene);
     }
 }
